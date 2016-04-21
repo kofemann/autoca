@@ -1,0 +1,4 @@
+ca:
+  cert: "signing-ca.crt"
+  key: "signing-ca.key"
+  key_pass: "secret"

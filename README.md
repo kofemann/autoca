@@ -1,2 +1,2 @@
 # autoca
-Serive to autogenerate host/client certificates
+Service to autogenerate host/client certificates
