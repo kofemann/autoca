@@ -11,6 +11,9 @@ type Conf struct {
 		KeyFile  string `yaml:"key"`
 		KeyPass  string `yaml:"key_pass"`
 	}
+	Cert struct {
+		Days int `yaml:"days"`
+	}
 }
 
 func GetConf() (*Conf, error) {

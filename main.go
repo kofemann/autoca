@@ -23,7 +23,7 @@ func main() {
 		os.Exit(2)
 	}
 
-	t := ca.GetCertificateTemplate("localhost", time.Now(), time.Now().AddDate(5, 5, 5))
+	t := ca.GetCertificateTemplate("localhost", time.Now(), time.Now().AddDate(0, 0, conf.Cert.Days))
 
 	privatekey, err := rsa.GenerateKey(rand.Reader, 2048)
 	publickey := &privatekey.PublicKey
