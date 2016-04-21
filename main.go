@@ -9,6 +9,7 @@ import (
 	"github.com/kofemann/autoca/ca"
 	"github.com/kofemann/autoca/config"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"strconv"
@@ -27,7 +28,17 @@ type WebCa struct {
 
 func (webca *WebCa) handle(rw http.ResponseWriter, req *http.Request) {
 
-	t := webca.ca.GetCertificateTemplate("localhost", time.Now(), time.Now().AddDate(0, 0, webca.conf.Cert.Days))
+	host, _, err := net.SplitHostPort(req.RemoteAddr)
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+	}
+
+	hostNames, err := net.LookupAddr(host)
+	if err != nil {
+		http.Error(rw, err.Error(), http.StatusInternalServerError)
+	}
+
+	t := webca.ca.GetCertificateTemplate(hostNames[0], time.Now(), time.Now().AddDate(0, 0, webca.conf.Cert.Days))
 
 	privatekey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
