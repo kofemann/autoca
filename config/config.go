@@ -14,6 +14,9 @@ type Conf struct {
 	Cert struct {
 		Days int `yaml:"days"`
 	}
+	Web struct {
+		Port int `yaml:"port"`
+	}
 }
 
 func GetConf() (*Conf, error) {

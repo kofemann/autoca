@@ -5,3 +5,6 @@ ca:
 
 cert:
   days: 1
+
+web:
+  port: 8081
