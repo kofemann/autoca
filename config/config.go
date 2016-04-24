@@ -10,6 +10,7 @@ type Conf struct {
 		CertFile string `yaml:"cert"`
 		KeyFile  string `yaml:"key"`
 		KeyPass  string `yaml:"key_pass"`
+		SerialDB string `yaml:"db"`
 	}
 	Cert struct {
 		Days int `yaml:"days"`

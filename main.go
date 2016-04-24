@@ -18,7 +18,7 @@ func main() {
 	}
 
 	ca := &autoca.AutoCA{}
-	err = ca.Init(conf.CA.CertFile, conf.CA.KeyFile, conf.CA.KeyPass)
+	err = ca.Init(conf.CA.CertFile, conf.CA.KeyFile, conf.CA.KeyPass, conf.CA.SerialDB)
 	if err != nil {
 		os.Exit(2)
 	}

@@ -10,6 +10,7 @@ import (
 	"log"
 	"math/big"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -18,9 +19,10 @@ var LOGGER = log.New(os.Stdout, "AutoCA ", log.Ldate|log.Ltime|log.Lshortfile)
 type AutoCA struct {
 	cert       *x509.Certificate
 	privateKey *rsa.PrivateKey
+	serialDB   string
 }
 
-func (ca *AutoCA) Init(certFile string, keyFile string, pass string) error {
+func (ca *AutoCA) Init(certFile string, keyFile string, pass string, db string) error {
 
 	data, err := ioutil.ReadFile(certFile)
 	if err != nil {
@@ -53,15 +55,16 @@ func (ca *AutoCA) Init(certFile string, keyFile string, pass string) error {
 		LOGGER.Printf("Failed to decode key: %v\n", err)
 		return err
 	}
+	ca.serialDB = db
 	return nil
 }
 
-func (ca *AutoCA) GetCertificateTemplate(dn string, notBefore time.Time, notAfter time.Time) *x509.Certificate {
+func (ca *AutoCA) GetHostCertificateTemplate(dn []string, notBefore time.Time, notAfter time.Time) *x509.Certificate {
 
 	template := &x509.Certificate{
 		IsCA: false,
 		BasicConstraintsValid: true,
-		SerialNumber:          big.NewInt(1234),
+		SerialNumber:          big.NewInt(ca.nextSerial()),
 		Subject: pkix.Name{
 			Country:            ca.cert.Subject.Country,
 			Organization:       ca.cert.Subject.Organization,
@@ -70,12 +73,13 @@ func (ca *AutoCA) GetCertificateTemplate(dn string, notBefore time.Time, notAfte
 			Province:           ca.cert.Subject.Province,
 			StreetAddress:      ca.cert.Subject.StreetAddress,
 			PostalCode:         ca.cert.Subject.PostalCode,
-			CommonName:         dn,
+			CommonName:         dn[0],
 		},
 		NotBefore:   notBefore,
 		NotAfter:    notAfter,
 		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
 		KeyUsage:    x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
+		DNSNames:    dn[1:],
 	}
 
 	return template
@@ -90,5 +94,24 @@ func (ca *AutoCA) CreateCertificate(template *x509.Certificate, publicKey *rsa.P
 	}
 
 	return cert, nil
+
+}
+
+func (ca *AutoCA) nextSerial() int64 {
+
+	var serial int64
+	data, err := ioutil.ReadFile(ca.serialDB)
+	if err != nil && !os.IsNotExist(err) {
+		LOGGER.Printf("Failed to read serial: %v\n", err)
+	} else {
+		serial, err = strconv.ParseInt(string(data), 10, 64)
+	}
+
+	serial++
+	err = ioutil.WriteFile(ca.serialDB, []byte(strconv.FormatInt(serial, 10)), 0644)
+	if err != nil {
+		LOGGER.Printf("Failed to write new serial into %s : %v\n", ca.serialDB, err)
+	}
+	return serial
 
 }

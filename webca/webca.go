@@ -41,7 +41,7 @@ func (webca *WebCa) Handle(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	t := webca.Ca.GetCertificateTemplate(hostNames[0], time.Now(), time.Now().AddDate(0, 0, webca.Conf.Cert.Days))
+	t := webca.Ca.GetHostCertificateTemplate(hostNames, time.Now(), time.Now().AddDate(0, 0, webca.Conf.Cert.Days))
 
 	privatekey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
