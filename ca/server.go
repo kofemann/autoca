@@ -111,7 +111,7 @@ func (ca *AutoCA) nextSerial() int64 {
 	}
 
 	serial++
-	err = ioutil.WriteFile(ca.serialDB, []byte(strconv.FormatInt(serial, 10)), 0644)
+	err = ioutil.WriteFile(ca.serialDB, []byte(strconv.FormatInt(serial, 10)), 0600)
 	if err != nil {
 		LOGGER.Printf("Failed to write new serial into %s : %v\n", ca.serialDB, err)
 	}
