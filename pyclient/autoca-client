@@ -5,8 +5,7 @@ import urllib2
 import sys
 import json
 
-
-
+WS_PATH="/certificate"
 
 def usage_and_exit():
     print("Usage: autoca-client [-k <keyfile>] [-c <cerfile>] <autoca url>")
@@ -30,7 +29,7 @@ def main():
     else:
       usage_and_exit()
 
-  url = args[0]
+  url = args[0] + WS_PATH
   response = urllib2.urlopen(url).read()
   payload = json.loads(response)
 
