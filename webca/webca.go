@@ -60,8 +60,7 @@ func (webca *WebCa) Handle(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	certOut := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: x})
-	keyOut := pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(privatekey)})
+	certOut, keyOut := webca.encodeCertAndKey(x, privatekey)
 
 	cert := CertificateResponse{
 		Cert: string(certOut),
@@ -104,8 +103,15 @@ func (webca *WebCa) CreateLocalCerts(certFile string, keyFile string) {
 		LOGGER.Fatalf("Can't create a certificate:  %v\n", err)
 	}
 
-	certOut := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: x})
-	keyOut := pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(privatekey)})
-	err = ioutil.WriteFile(certFile, []byte(certOut), 0400)
-	err = ioutil.WriteFile(keyFile, []byte(keyOut), 0400)
+	certOut, keyOut := webca.encodeCertAndKey(x, privatekey)
+	err = ioutil.WriteFile(certFile, certOut, 0400)
+	err = ioutil.WriteFile(keyFile, keyOut, 0400)
+}
+
+func (webca *WebCa) encodeCertAndKey(cert []byte, key *rsa.PrivateKey) ([]byte, []byte) {
+
+	certOut := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: cert})
+	keyOut := pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(key)})
+
+	return certOut, keyOut
 }
