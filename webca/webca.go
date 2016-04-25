@@ -19,7 +19,7 @@ var LOGGER = log.New(os.Stdout, "WebCA ", log.Ldate|log.Ltime|log.Lshortfile)
 
 type CertificateResponse struct {
 	Cert string `json:"cert"`
-	Key  string `json:"Key"`
+	Key  string `json:"key"`
 }
 
 type WebCa struct {
