@@ -1,0 +1,47 @@
+#!/usr/bin/env python
+
+import getopt
+import urllib2
+import sys
+import json
+
+
+
+
+def usage_and_exit():
+    print("Usage: autoca-client [-k <keyfile>] [-c <cerfile>] <autoca url>")
+    sys.exit(1)
+
+def main():
+  
+  key_file = "hostkey.pem"
+  cert_file = "hostcert.pem"
+
+  opts, args = getopt.getopt(sys.argv[1:], 'c:k:')
+
+  if len(args) != 1 :
+      usage_and_exit()
+
+  for o, a in opts:
+    if o == '-k':
+      key_file = a
+    elif o == '-c':
+      cert_file = a
+    else:
+      usage_and_exit()
+
+  url = args[0]
+  response = urllib2.urlopen(url).read()
+  payload = json.loads(response)
+
+  with open(key_file, "w") as f:
+    f.write(payload['key'])
+
+  with open(cert_file, "w") as f:
+    f.write(payload['cert'])
+
+if __name__ == "__main__":
+  main()
+
+
+
