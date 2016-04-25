@@ -11,15 +11,17 @@ import (
 	"math/big"
 	"os"
 	"strconv"
+	"sync"
 	"time"
 )
 
 var LOGGER = log.New(os.Stdout, "AutoCA ", log.Ldate|log.Ltime|log.Lshortfile)
 
 type AutoCA struct {
-	cert       *x509.Certificate
-	privateKey *rsa.PrivateKey
-	serialDB   string
+	cert         *x509.Certificate
+	privateKey   *rsa.PrivateKey
+	serialDB     string
+	serialDBLock sync.Mutex
 }
 
 func (ca *AutoCA) Init(certFile string, keyFile string, pass string, db string) error {
@@ -99,6 +101,7 @@ func (ca *AutoCA) CreateCertificate(template *x509.Certificate, publicKey *rsa.P
 
 func (ca *AutoCA) nextSerial() int64 {
 
+	ca.serialDBLock.Lock()
 	var serial int64
 	data, err := ioutil.ReadFile(ca.serialDB)
 	if err != nil && !os.IsNotExist(err) {
@@ -112,6 +115,7 @@ func (ca *AutoCA) nextSerial() int64 {
 	if err != nil {
 		LOGGER.Printf("Failed to write new serial into %s : %v\n", ca.serialDB, err)
 	}
+	ca.serialDBLock.Unlock()
 	return serial
 
 }
