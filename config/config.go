@@ -16,7 +16,10 @@ type Conf struct {
 		Days int `yaml:"days"`
 	}
 	Web struct {
-		Port int `yaml:"port"`
+		Port         int    `yaml:"port"`
+		CertFile     string `yaml:"cert"`
+		KeyFile      string `yaml:"key"`
+		GenerateCert bool   `yaml:"generate_cert"`
 	}
 }
 

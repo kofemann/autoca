@@ -8,6 +8,7 @@ import (
 	"encoding/pem"
 	"github.com/kofemann/autoca/ca"
 	"github.com/kofemann/autoca/config"
+	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -74,4 +75,37 @@ func (webca *WebCa) Handle(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 	rw.Write(msg)
+}
+
+func (webca *WebCa) CreateLocalCerts(certFile string, keyFile string) {
+
+	host, err := os.Hostname()
+	if err != nil {
+		LOGGER.Fatalf("Can't discover local host name %v\n", err)
+	}
+
+	hostNames := make([]string, 1)
+	hostNames[0] = host
+	if err != nil || len(hostNames) == 0 {
+		LOGGER.Fatalf("Can't resolve hostnames for %v\n", host)
+	}
+
+	t := webca.Ca.GetHostCertificateTemplate(hostNames, time.Now(), time.Now().AddDate(0, 0, webca.Conf.Cert.Days))
+
+	privatekey, err := rsa.GenerateKey(rand.Reader, 2048)
+	if err != nil {
+		LOGGER.Fatalf("Can't generate key pair:  %v\n", err)
+	}
+
+	publickey := &privatekey.PublicKey
+
+	x, err := webca.Ca.CreateCertificate(t, publickey)
+	if err != nil {
+		LOGGER.Fatalf("Can't create a certificate:  %v\n", err)
+	}
+
+	certOut := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: x})
+	keyOut := pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(privatekey)})
+	err = ioutil.WriteFile(certFile, []byte(certOut), 0400)
+	err = ioutil.WriteFile(keyFile, []byte(keyOut), 0400)
 }

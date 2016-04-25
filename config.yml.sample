@@ -9,3 +9,7 @@ cert:
 
 web:
   port: 8081
+  cert: "data/hostcert.pem"
+  key: "data/hostkey.pem"
+  generate_cert: true
+
