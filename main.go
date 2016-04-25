@@ -24,7 +24,7 @@ func main() {
 	}
 
 	webCa := &webca.WebCa{Ca: ca, Conf: conf}
-	http.HandleFunc("/certificate", webCa.Handle)
+	http.HandleFunc("/v1/certificate", webCa.Handle)
 	err = http.ListenAndServe(":"+strconv.Itoa(conf.Web.Port), nil)
 	if err != nil {
 		log.Fatal("Failed to start server:", err)
