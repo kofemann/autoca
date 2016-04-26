@@ -4,19 +4,26 @@ import getopt
 import urllib2
 import sys
 import json
+import ssl
 
 WS_PATH="/v1/certificate"
 
 def usage_and_exit():
-    print("Usage: autoca-client [-k <keyfile>] [-c <cerfile>] <autoca url>")
+    print("Usage: autoca-client [-k <keyfile>] [-c <cerfile>] [-n] <autoca url>")
+    print("")
+    print("   -k  <keyfile>  : path to key file, default hostkey.pem")
+    print("   -c  <certfile> : path to cert file, default hostcert.pen")
+    print("   -n             : disable webca host certificate validation ")
+    print("")
     sys.exit(1)
 
 def main():
   
   key_file = "hostkey.pem"
   cert_file = "hostcert.pem"
+  context = ssl.create_default_context()
 
-  opts, args = getopt.getopt(sys.argv[1:], 'c:k:')
+  opts, args = getopt.getopt(sys.argv[1:], 'c:k:n')
 
   if len(args) != 1 :
       usage_and_exit()
@@ -26,11 +33,13 @@ def main():
       key_file = a
     elif o == '-c':
       cert_file = a
+    elif o == '-n':
+      context = ssl._create_unverified_context()
     else:
       usage_and_exit()
 
   url = args[0] + WS_PATH
-  response = urllib2.urlopen(url).read()
+  response = urllib2.urlopen(url, context = context).read()
   payload = json.loads(response)
 
   with open(key_file, "w") as f:
