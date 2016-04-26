@@ -13,7 +13,12 @@ def usage_and_exit():
     print("")
     print("   -k  <keyfile>  : path to key file, default hostkey.pem")
     print("   -c  <certfile> : path to cert file, default hostcert.pen")
-    print("   -n             : disable webca host certificate validation ")
+    print("   -n             : disable webca host certificate validation")
+    print("")
+    print("")
+    print("   Example:")
+    print("")
+    print("       $ autoca-client -k myhostkey.pem -c myhostcert.pem -n https://example.invalid/")
     print("")
     sys.exit(1)
 
