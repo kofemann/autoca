@@ -83,8 +83,7 @@ func (webca *WebCa) CreateLocalCerts(certFile string, keyFile string) {
 		LOGGER.Fatalf("Can't discover local host name %v\n", err)
 	}
 
-	hostNames := make([]string, 1)
-	hostNames[0] = host
+	hostNames := []string{host}
 	if err != nil || len(hostNames) == 0 {
 		LOGGER.Fatalf("Can't resolve hostnames for %v\n", host)
 	}
