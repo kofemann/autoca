@@ -5,6 +5,7 @@ import urllib2
 import sys
 import json
 import ssl
+import os
 
 WS_PATH="/v1/certificate"
 
@@ -47,11 +48,13 @@ def main():
   response = urllib2.urlopen(url, context = context).read()
   payload = json.loads(response)
 
-  with open(key_file, "w") as f:
-    f.write(payload['key'])
+  f = os.open(key_file, os.O_TRUNC|os.O_CREAT|os.O_WRONLY, 0600)
+  os.write(f, payload['key'])
+  os.close(f)
 
-  with open(cert_file, "w") as f:
-    f.write(payload['cert'])
+  f = os.open(cert_file, os.O_TRUNC|os.O_CREAT|os.O_WRONLY, 0600)
+  os.write(f, payload['cert'])
+  os.close(f)
 
 if __name__ == "__main__":
   main()
