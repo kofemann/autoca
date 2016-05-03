@@ -7,14 +7,14 @@ import (
 // returns trye if ip address matches one from the allowed list
 func IpMatch(ip net.IP, allowed []string) bool {
 
-	for i := range allowed {
-		addr, network, err := net.ParseCIDR(allowed[i])
+	for _, v := range allowed {
+		addr, network, err := net.ParseCIDR(v)
 		if err == nil {
 			if network != nil && network.Contains(ip) {
 				return true
 			}
 		} else {
-			addr = net.ParseIP(allowed[i])
+			addr = net.ParseIP(v)
 			if addr.Equal(ip) {
 				return true
 			}
