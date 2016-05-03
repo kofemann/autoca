@@ -61,8 +61,9 @@ func (ca *AutoCA) Init(certFile string, keyFile string, pass string, db string) 
 	return nil
 }
 
-func (ca *AutoCA) GetHostCertificateTemplate(dn []string, notBefore time.Time, notAfter time.Time) *x509.Certificate {
+func (ca *AutoCA) GetHostCertificateTemplate(hosts []string, notBefore time.Time, notAfter time.Time) *x509.Certificate {
 
+	dn := sanitizeFQDN(hosts)
 	template := &x509.Certificate{
 		IsCA: false,
 		BasicConstraintsValid: true,
@@ -81,7 +82,7 @@ func (ca *AutoCA) GetHostCertificateTemplate(dn []string, notBefore time.Time, n
 		NotAfter:    notAfter,
 		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
 		KeyUsage:    x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
-		DNSNames:    dn[1:],
+		DNSNames:    dn,
 	}
 
 	return template
@@ -118,4 +119,15 @@ func (ca *AutoCA) nextSerial() int64 {
 	ca.serialDBLock.Unlock()
 	return serial
 
+}
+
+func sanitizeFQDN(hostnames []string) []string {
+
+	sanitized := hostnames[:]
+	for i, s := range sanitized {
+		if s[len(s)-1] == '.' {
+			sanitized[i] = s[:len(s)-1]
+		}
+	}
+	return sanitized
 }
