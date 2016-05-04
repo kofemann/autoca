@@ -23,11 +23,11 @@ type Conf struct {
 	}
 }
 
-func GetConf() (*Conf, error) {
+func GetConf(file string) (*Conf, error) {
 
 	c := &Conf{}
 
-	yamlFile, err := ioutil.ReadFile("config.yml")
+	yamlFile, err := ioutil.ReadFile(file)
 	if err != nil {
 		return nil, err
 	}

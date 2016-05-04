@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"github.com/kofemann/autoca/ca"
 	"github.com/kofemann/autoca/config"
 	"github.com/kofemann/autoca/webca"
@@ -10,11 +11,15 @@ import (
 	"strconv"
 )
 
+var configFile = flag.String("c", "config.yml", "path to config file")
+
 func main() {
 
-	conf, err := config.GetConf()
+	flag.Parse()
+
+	conf, err := config.GetConf(*configFile)
 	if err != nil {
-		os.Exit(1)
+		log.Fatalf("Failed to read confif file: %v\n", err)
 	}
 
 	ca := &autoca.AutoCA{}
