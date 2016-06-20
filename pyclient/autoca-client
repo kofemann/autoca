@@ -13,7 +13,7 @@ def usage_and_exit():
     print("Usage: autoca-client [-k <keyfile>] [-c <cerfile>] [-n] <autoca url>")
     print("")
     print("   -k  <keyfile>  : path to key file, default hostkey.pem")
-    print("   -c  <certfile> : path to cert file, default hostcert.pen")
+    print("   -c  <certfile> : path to cert file, default hostcert.pem")
     print("   -n             : disable webca host certificate validation")
     print("")
     print("")
