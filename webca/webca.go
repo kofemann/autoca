@@ -135,7 +135,13 @@ func (webca *WebCa) CreateLocalCerts(certFile string, keyFile string) {
 
 	certOut, keyOut := webca.encodePkcs1CertAndKey(x, privatekey)
 	err = ioutil.WriteFile(certFile, certOut, 0400)
+	if err != nil {
+		LOGGER.Fatalf("Failed to write certificate: %v\n", err)
+	}
 	err = ioutil.WriteFile(keyFile, keyOut, 0400)
+	if err != nil {
+		LOGGER.Fatalf("Failed to write key: %v\n", err)
+	}
 }
 
 func rsaToPkcs8(key *rsa.PrivateKey) []byte {
