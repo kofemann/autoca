@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
+	"encoding/asn1"
 	"encoding/json"
 	"encoding/pem"
 	"io/ioutil"
@@ -22,6 +23,12 @@ var LOGGER = log.New(os.Stdout, "WebCA ", log.Ldate|log.Ltime|log.Lshortfile)
 type CertificateResponse struct {
 	Cert string `json:"cert"`
 	Key  string `json:"key"`
+}
+
+type pkcs8Key struct {
+	Version             int
+	PrivateKeyAlgorithm []asn1.ObjectIdentifier
+	PrivateKey          []byte
 }
 
 type WebCa struct {
@@ -43,6 +50,7 @@ func (webca *WebCa) handleGet(rw http.ResponseWriter, req *http.Request) {
 	host, _, err := net.SplitHostPort(req.RemoteAddr)
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	hostNames, err := net.LookupAddr(host)
@@ -70,7 +78,20 @@ func (webca *WebCa) handleGet(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	certOut, keyOut := webca.encodeCertAndKey(x, privatekey)
+	var certOut, keyOut []byte
+
+	outForm := req.FormValue("out")
+	switch outForm {
+	case "pkcs8":
+		certOut, keyOut = webca.encodePkcs8CertAndKey(x, privatekey)
+	case "":
+		fallthrough
+	case "pkcs1":
+		certOut, keyOut = webca.encodePkcs1CertAndKey(x, privatekey)
+	default:
+		http.Error(rw, "Unsupported out key form: "+outForm, http.StatusBadRequest)
+		return
+	}
 
 	cert := CertificateResponse{
 		Cert: string(certOut),
@@ -112,15 +133,35 @@ func (webca *WebCa) CreateLocalCerts(certFile string, keyFile string) {
 		LOGGER.Fatalf("Can't create a certificate:  %v\n", err)
 	}
 
-	certOut, keyOut := webca.encodeCertAndKey(x, privatekey)
+	certOut, keyOut := webca.encodePkcs1CertAndKey(x, privatekey)
 	err = ioutil.WriteFile(certFile, certOut, 0400)
 	err = ioutil.WriteFile(keyFile, keyOut, 0400)
 }
 
-func (webca *WebCa) encodeCertAndKey(cert []byte, key *rsa.PrivateKey) ([]byte, []byte) {
+func rsaToPkcs8(key *rsa.PrivateKey) []byte {
+
+	var pkey pkcs8Key
+	pkey.Version = 0
+	pkey.PrivateKeyAlgorithm = make([]asn1.ObjectIdentifier, 1)
+	pkey.PrivateKeyAlgorithm[0] = asn1.ObjectIdentifier{1, 2, 840, 113549, 1, 1, 1}
+	pkey.PrivateKey = x509.MarshalPKCS1PrivateKey(key)
+
+	out, _ := asn1.Marshal(pkey)
+	return out
+}
+
+func (webca *WebCa) encodePkcs1CertAndKey(cert []byte, key *rsa.PrivateKey) ([]byte, []byte) {
 
 	certOut := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: cert})
-	keyOut := pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(key)})
+	keyOut := pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: rsaToPkcs8(key)})
+
+	return certOut, keyOut
+}
+
+func (webca *WebCa) encodePkcs8CertAndKey(cert []byte, key *rsa.PrivateKey) ([]byte, []byte) {
+
+	certOut := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: cert})
+	keyOut := pem.EncodeToMemory(&pem.Block{Type: "PRIVATE KEY", Bytes: rsaToPkcs8(key)})
 
 	return certOut, keyOut
 }

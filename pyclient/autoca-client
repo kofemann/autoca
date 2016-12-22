@@ -10,11 +10,12 @@ import os
 WS_PATH="/v1/certificate"
 
 def usage_and_exit():
-    print("Usage: autoca-client [-k <keyfile>] [-c <cerfile>] [-n] <autoca url>")
+    print("Usage: autoca-client [-k <keyfile>] [-c <cerfile>] [-o pkcs1|pkcs8] [-n] <autoca url>")
     print("")
     print("   -k  <keyfile>  : path to key file, default hostkey.pem")
     print("   -c  <certfile> : path to cert file, default hostcert.pem")
     print("   -n             : disable webca host certificate validation")
+    print("   -o  <format>   : generate key in pecified form, default pkcs1")
     print("")
     print("")
     print("   Example:")
@@ -24,12 +25,13 @@ def usage_and_exit():
     sys.exit(1)
 
 def main():
-  
+
   key_file = "hostkey.pem"
   cert_file = "hostcert.pem"
   context = ssl.create_default_context()
+  out_form = 'pkcs1'
 
-  opts, args = getopt.getopt(sys.argv[1:], 'c:k:n')
+  opts, args = getopt.getopt(sys.argv[1:], 'c:k:no:')
 
   if len(args) != 1 :
       usage_and_exit()
@@ -41,10 +43,12 @@ def main():
       cert_file = a
     elif o == '-n':
       context = ssl._create_unverified_context()
+    elif o =='-o':
+      out_form = a
     else:
       usage_and_exit()
 
-  url = args[0] + WS_PATH
+  url = args[0] + WS_PATH + '?out=' + out_form
   response = urllib2.urlopen(url, context = context).read()
   payload = json.loads(response)
 
@@ -58,6 +62,3 @@ def main():
 
 if __name__ == "__main__":
   main()
-
-
-
