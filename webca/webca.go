@@ -6,14 +6,15 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"encoding/pem"
-	"github.com/kofemann/autoca/ca"
-	"github.com/kofemann/autoca/config"
 	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/kofemann/autoca/ca"
+	"github.com/kofemann/autoca/config"
 )
 
 var LOGGER = log.New(os.Stdout, "WebCA ", log.Ldate|log.Ltime|log.Lshortfile)
@@ -29,6 +30,15 @@ type WebCa struct {
 }
 
 func (webca *WebCa) Handle(rw http.ResponseWriter, req *http.Request) {
+	switch req.Method {
+	case "GET":
+		webca.handleGet(rw, req)
+	default:
+		http.Error(rw, "Unsupported HTTP method: "+req.Method, http.StatusBadRequest)
+	}
+}
+
+func (webca *WebCa) handleGet(rw http.ResponseWriter, req *http.Request) {
 
 	host, _, err := net.SplitHostPort(req.RemoteAddr)
 	if err != nil {
