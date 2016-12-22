@@ -47,20 +47,29 @@ func (webca *WebCa) Handle(rw http.ResponseWriter, req *http.Request) {
 
 func (webca *WebCa) handleGet(rw http.ResponseWriter, req *http.Request) {
 
-	host, _, err := net.SplitHostPort(req.RemoteAddr)
-	if err != nil {
-		http.Error(rw, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	var t *x509.Certificate
 
-	hostNames, err := net.LookupAddr(host)
-	if err != nil || len(hostNames) == 0 {
-		LOGGER.Printf("Can't resolve hostnames for %v\n", host)
-		http.Error(rw, err.Error(), http.StatusNotFound)
-		return
-	}
+	cn := req.FormValue("cn")
+	// id no CN provided use the client's host name
+	if len(cn) == 0 {
+		host, _, err := net.SplitHostPort(req.RemoteAddr)
+		if err != nil {
+			http.Error(rw, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
-	t := webca.Ca.GetHostCertificateTemplate(hostNames, time.Now(), time.Now().AddDate(0, 0, webca.Conf.Cert.Days))
+		hostNames, err := net.LookupAddr(host)
+		if err != nil || len(hostNames) == 0 {
+			LOGGER.Printf("Can't resolve hostnames for %v\n", host)
+			http.Error(rw, err.Error(), http.StatusNotFound)
+			return
+		}
+
+		t = webca.Ca.GetHostCertificateTemplate(hostNames, time.Now(), time.Now().AddDate(0, 0, webca.Conf.Cert.Days))
+
+	} else {
+		t = webca.Ca.GetUserCertificateTemplate(cn, time.Now(), time.Now().AddDate(0, 0, webca.Conf.Cert.Days))
+	}
 
 	privatekey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {

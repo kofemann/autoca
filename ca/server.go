@@ -88,6 +88,31 @@ func (ca *AutoCA) GetHostCertificateTemplate(hosts []string, notBefore time.Time
 	return template
 }
 
+func (ca *AutoCA) GetUserCertificateTemplate(cn string, notBefore time.Time, notAfter time.Time) *x509.Certificate {
+
+	template := &x509.Certificate{
+		IsCA: false,
+		BasicConstraintsValid: true,
+		SerialNumber:          big.NewInt(ca.nextSerial()),
+		Subject: pkix.Name{
+			Country:            ca.cert.Subject.Country,
+			Organization:       ca.cert.Subject.Organization,
+			OrganizationalUnit: ca.cert.Subject.OrganizationalUnit,
+			Locality:           ca.cert.Subject.Locality,
+			Province:           ca.cert.Subject.Province,
+			StreetAddress:      ca.cert.Subject.StreetAddress,
+			PostalCode:         ca.cert.Subject.PostalCode,
+			CommonName:         cn,
+		},
+		NotBefore:   notBefore,
+		NotAfter:    notAfter,
+		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
+		KeyUsage:    x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
+	}
+
+	return template
+}
+
 func (ca *AutoCA) CreateCertificate(template *x509.Certificate, publicKey *rsa.PublicKey) ([]byte, error) {
 
 	cert, err := x509.CreateCertificate(rand.Reader, template, ca.cert, publicKey, ca.privateKey)

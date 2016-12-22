@@ -2,6 +2,7 @@
 
 import getopt
 import urllib2
+import urllib
 import sys
 import json
 import ssl
@@ -10,7 +11,7 @@ import os
 WS_PATH="/v1/certificate"
 
 def usage_and_exit():
-    print("Usage: autoca-client [-k <keyfile>] [-c <cerfile>] [-o pkcs1|pkcs8] [-n] <autoca url>")
+    print("Usage: autoca-client [-k <keyfile>] [-c <cerfile>] [-o pkcs1|pkcs8] [-n] <autoca url> [common name]")
     print("")
     print("   -k  <keyfile>  : path to key file, default hostkey.pem")
     print("   -c  <certfile> : path to cert file, default hostcert.pem")
@@ -33,7 +34,7 @@ def main():
 
   opts, args = getopt.getopt(sys.argv[1:], 'c:k:no:')
 
-  if len(args) != 1 :
+  if len(args) > 2 or len(args) < 1 :
       usage_and_exit()
 
   for o, a in opts:
@@ -48,7 +49,13 @@ def main():
     else:
       usage_and_exit()
 
-  url = args[0] + WS_PATH + '?out=' + out_form
+  opts = {}
+  opts['out'] = out_form
+  if len(args) == 2:
+    opts['cn'] = args[1]
+
+  url = args[0] + WS_PATH + '?' + urllib.urlencode(opts)
+
   response = urllib2.urlopen(url, context = context).read()
   payload = json.loads(response)
 
