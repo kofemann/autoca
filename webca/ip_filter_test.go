@@ -32,6 +32,10 @@ var nonMatchingIP6 = []string{
 	"fe80::9cef:b4ff:fef1::1/64",
 }
 
+var star = []string{
+	"*",
+}
+
 func TestIPv4Matcher(t *testing.T) {
 
 	if !IpMatch(testIPv4, matchingIP4) {
@@ -40,7 +44,6 @@ func TestIPv4Matcher(t *testing.T) {
 	if IpMatch(testIPv4, nonMatchingIP4) {
 		t.Error("test failed: non matcing not detected")
 	}
-
 }
 
 func TestIPv6Matcher(t *testing.T) {
@@ -51,5 +54,13 @@ func TestIPv6Matcher(t *testing.T) {
 	if IpMatch(testIPv6, nonMatchingIP6) {
 		t.Error("test failed: non matcing not detected")
 	}
+}
 
+func testStarMatchesAny(t *testing.T) {
+	if !IpMatch(testIPv6, star) {
+		t.Error("test failed: matching not detected")
+	}
+	if !IpMatch(testIPv4, star) {
+		t.Error("test failed: matching not detected")
+	}
 }

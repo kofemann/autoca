@@ -8,6 +8,11 @@ import (
 func IpMatch(ip net.IP, allowed []string) bool {
 
 	for _, v := range allowed {
+
+		if v == "*" {
+			return true
+		}
+
 		addr, network, err := net.ParseCIDR(v)
 		if err == nil {
 			if network != nil && network.Contains(ip) {
