@@ -7,6 +7,7 @@ import (
 	"encoding/asn1"
 	"encoding/json"
 	"encoding/pem"
+	"errors"
 	"io/ioutil"
 	"log"
 	"net"
@@ -36,7 +37,33 @@ type WebCa struct {
 	Conf *config.Conf
 }
 
+func (webca *WebCa) checkClientIp(req *http.Request) error {
+
+	host, _, err := net.SplitHostPort(req.RemoteAddr)
+	if err != nil {
+		return err
+	}
+
+	ip := net.ParseIP(host)
+	if ip == nil {
+		return errors.New("Can't parse IP address")
+	}
+
+	if !IpMatch(ip, webca.Conf.Web.Hosts) {
+		return errors.New(host + " Not Allowed")
+	}
+	return nil
+
+}
+
 func (webca *WebCa) Handle(rw http.ResponseWriter, req *http.Request) {
+
+	err := webca.checkClientIp(req)
+	if err != nil {
+		http.Error(rw, "Not authorized: "+err.Error(), http.StatusForbidden)
+		return
+	}
+
 	switch req.Method {
 	case "GET":
 		webca.handleGet(rw, req)

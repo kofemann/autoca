@@ -1,8 +1,9 @@
 package config
 
 import (
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
+
+	"gopkg.in/yaml.v2"
 )
 
 type Conf struct {
@@ -16,10 +17,11 @@ type Conf struct {
 		Days int `yaml:"days"`
 	}
 	Web struct {
-		Port         int    `yaml:"port"`
-		CertFile     string `yaml:"cert"`
-		KeyFile      string `yaml:"key"`
-		GenerateCert bool   `yaml:"generate_cert"`
+		Port         int      `yaml:"port"`
+		CertFile     string   `yaml:"cert"`
+		KeyFile      string   `yaml:"key"`
+		Hosts        []string `yaml:"hosts"`
+		GenerateCert bool     `yaml:"generate_cert"`
 	}
 }
 

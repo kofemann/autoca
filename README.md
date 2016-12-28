@@ -21,7 +21,7 @@ web:
   cert: "data/hostcert.pem"
   key: "data/hostkey.pem"
   generate_cert: true
-
+  hosts: ["127.0.0.1", "192.169.17.0/24"]
 ```
 
 
