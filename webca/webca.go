@@ -195,7 +195,7 @@ func rsaToPkcs8(key *rsa.PrivateKey) []byte {
 func (webca *WebCa) encodePkcs1CertAndKey(cert []byte, key *rsa.PrivateKey) ([]byte, []byte) {
 
 	certOut := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: cert})
-	keyOut := pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: rsaToPkcs8(key)})
+	keyOut := pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(key)})
 
 	return certOut, keyOut
 }
