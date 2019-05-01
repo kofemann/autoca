@@ -19,7 +19,7 @@ func main() {
 
 	conf, err := config.GetConf(*configFile)
 	if err != nil {
-		log.Fatalf("Failed to read confif file: %v\n", err)
+		log.Fatalf("Failed to read config file: %v\n", err)
 	}
 
 	ca := &autoca.AutoCA{}
