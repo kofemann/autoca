@@ -45,11 +45,16 @@ func (ca *AutoCA) Init(certFile string, keyFile string, pass string, db string) 
 		return err
 	}
 
+	var key []byte
 	k, _ := pem.Decode(data)
-	key, err := x509.DecryptPEMBlock(k, []byte(pass))
-	if err != nil {
-		LOGGER.Printf("Failed to decrypt key: %v\n", err)
-		return err
+	if pass == "" {
+		key = k.Bytes
+	} else {
+		key, err = x509.DecryptPEMBlock(k, []byte(pass))
+		if err != nil {
+			LOGGER.Printf("Failed to decrypt key: %v\n", err)
+			return err
+		}
 	}
 
 	ca.privateKey, err = x509.ParsePKCS1PrivateKey(key)
