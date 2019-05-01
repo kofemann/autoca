@@ -145,14 +145,17 @@ func (webca *WebCa) handleGet(rw http.ResponseWriter, req *http.Request) {
 
 func (webca *WebCa) CreateLocalCerts(certFile string, keyFile string) {
 
-	host, err := os.Hostname()
+	hostNames, err := resolveLocalNames()
 	if err != nil {
-		LOGGER.Fatalf("Can't discover local host name %v\n", err)
+		LOGGER.Fatalf("Can't resolve hostnames: %v\n", err)
 	}
 
-	hostNames := []string{host}
-	if err != nil || len(hostNames) == 0 {
-		LOGGER.Fatalf("Can't resolve hostnames for %v\n", host)
+	if len(hostNames) == 0 {
+		host, err := os.Hostname()
+		if err != nil {
+			LOGGER.Fatalf("Can't discover local host name %v\n", err)
+		}
+		hostNames = []string{host, "localhost"}
 	}
 
 	t := webca.Ca.GetHostCertificateTemplate(hostNames, time.Now(), time.Now().AddDate(0, 0, webca.Conf.Cert.Days))
@@ -206,4 +209,27 @@ func (webca *WebCa) encodePkcs8CertAndKey(cert []byte, key *rsa.PrivateKey) ([]b
 	keyOut := pem.EncodeToMemory(&pem.Block{Type: "PRIVATE KEY", Bytes: rsaToPkcs8(key)})
 
 	return certOut, keyOut
+}
+
+func resolveLocalNames() ([]string, error) {
+
+	localNames := []string{}
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return localNames, err
+	}
+
+	for _, addr := range addrs {
+		ip, _, _ := net.ParseCIDR(addr.String())
+		if !ip.IsLoopback() {
+			names, err := net.LookupAddr(ip.String())
+			if err == nil {
+				for _, name := range names {
+					localNames = append(localNames, name)
+				}
+			}
+		}
+	}
+
+	return localNames, nil
 }
