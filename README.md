@@ -1,10 +1,9 @@
-AutoCa
-======
+# AutoCa
 
 Service to autogenerate host/client certificates
 
-Config
--------
+## Config
+
 ```yaml
 ca:
   cert: "signing-ca.crt"
@@ -23,13 +22,17 @@ web:
   hosts: ["127.0.0.1", "192.169.17.0/24"]
 ```
 
-HowTo use
----------
+## HowTo use
+
+### python client
+
 There is a sample client in python to get certificates:
 
 ```sh
 $ ./pyclient/autoca-client -n https://localhost:8081/
 ```
+
+### without special client
 
 Hard core users can use `curl` + `jq`
 
@@ -39,3 +42,9 @@ $ jq -r '.cert?' autoca.out > hostcert.pem
 $ jq -r '.key?' autoca.out > hostkey.pem
 $ rm autoca.out
 ```
+
+## LICENSE
+
+This work is published under [GPLv3][1] license.
+
+[1]: https://www.gnu.org/licenses/gpl-3.0.txt
