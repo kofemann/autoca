@@ -3,7 +3,6 @@ AutoCa
 
 Service to autogenerate host/client certificates
 
-
 Config
 -------
 ```yaml
@@ -24,11 +23,19 @@ web:
   hosts: ["127.0.0.1", "192.169.17.0/24"]
 ```
 
-
-Howto use
+HowTo use
 ---------
-There is a sample client in python to get certigicates:
+There is a sample client in python to get certificates:
 
-```
+```sh
 $ ./pyclient/autoca-client -n https://localhost:8081/
+```
+
+Hard core users can use `curl` + `jq`
+
+```sh
+$ curl -s 'https://localhost:8081/v1/certificate' -o autoca.out
+$ jq -r '.cert?' autoca.out > hostcert.pem
+$ jq -r '.key?' autoca.out > hostkey.pem
+$ rm autoca.out
 ```
