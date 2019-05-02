@@ -85,8 +85,8 @@ func (ca *AutoCA) GetHostCertificateTemplate(hosts []string, notBefore time.Time
 		},
 		NotBefore:   notBefore,
 		NotAfter:    notAfter,
-		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
-		KeyUsage:    x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
+		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth},
+		KeyUsage:    x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
 		DNSNames:    dn,
 	}
 
@@ -112,7 +112,7 @@ func (ca *AutoCA) GetUserCertificateTemplate(cn string, notBefore time.Time, not
 		NotBefore:   notBefore,
 		NotAfter:    notAfter,
 		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
-		KeyUsage:    x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
+		KeyUsage:    x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign | x509.KeyUsageKeyEncipherment,
 	}
 
 	return template
