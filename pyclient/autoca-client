@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 import getopt
-import urllib2
-import urllib
+import urllib.request
+import urllib.parse
 import sys
 import json
 import ssl
@@ -54,17 +54,17 @@ def main():
   if len(args) == 2:
     opts['cn'] = args[1]
 
-  url = args[0] + WS_PATH + '?' + urllib.urlencode(opts)
+  url = args[0] + WS_PATH + '?' + urllib.parse.urlencode(opts)
 
-  response = urllib2.urlopen(url, context = context).read()
+  response = urllib.request.urlopen(url, context = context).read()
   payload = json.loads(response)
 
-  f = os.open(key_file, os.O_TRUNC|os.O_CREAT|os.O_WRONLY, 0600)
-  os.write(f, payload['key'])
+  f = os.open(key_file, os.O_TRUNC|os.O_CREAT|os.O_WRONLY, 0o600)
+  os.write(f, payload['key'].encode('ascii'))
   os.close(f)
 
-  f = os.open(cert_file, os.O_TRUNC|os.O_CREAT|os.O_WRONLY, 0600)
-  os.write(f, payload['cert'])
+  f = os.open(cert_file, os.O_TRUNC|os.O_CREAT|os.O_WRONLY, 0o600)
+  os.write(f, payload['cert'].encode('ascii'))
   os.close(f)
 
 if __name__ == "__main__":
