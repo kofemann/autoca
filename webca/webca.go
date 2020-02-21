@@ -15,7 +15,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/kofemann/autoca/ca"
+	autoca "github.com/kofemann/autoca/ca"
 	"github.com/kofemann/autoca/config"
 )
 
@@ -92,7 +92,7 @@ func (webca *WebCa) handleGet(rw http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		t = webca.Ca.GetHostCertificateTemplate(hostNames, time.Now(), time.Now().AddDate(0, 0, webca.Conf.Cert.Days))
+		t = webca.Ca.GetHostCertificateTemplate(hostNames, []net.IP{net.ParseIP(host)}, time.Now(), time.Now().AddDate(0, 0, webca.Conf.Cert.Days))
 
 	} else {
 		t = webca.Ca.GetUserCertificateTemplate(cn, time.Now(), time.Now().AddDate(0, 0, webca.Conf.Cert.Days))
@@ -158,7 +158,7 @@ func (webca *WebCa) CreateLocalCerts(certFile string, keyFile string) {
 		hostNames = []string{host, "localhost"}
 	}
 
-	t := webca.Ca.GetHostCertificateTemplate(hostNames, time.Now(), time.Now().AddDate(0, 0, webca.Conf.Cert.Days))
+	t := webca.Ca.GetHostCertificateTemplate(hostNames, []net.IP{}, time.Now(), time.Now().AddDate(0, 0, webca.Conf.Cert.Days))
 
 	privatekey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {

@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"math/big"
+	"net"
 	"os"
 	"strconv"
 	"sync"
@@ -66,11 +67,11 @@ func (ca *AutoCA) Init(certFile string, keyFile string, pass string, db string) 
 	return nil
 }
 
-func (ca *AutoCA) GetHostCertificateTemplate(hosts []string, notBefore time.Time, notAfter time.Time) *x509.Certificate {
+func (ca *AutoCA) GetHostCertificateTemplate(hosts []string, addrs []net.IP, notBefore time.Time, notAfter time.Time) *x509.Certificate {
 
 	dn := sanitizeFQDN(hosts)
 	template := &x509.Certificate{
-		IsCA: false,
+		IsCA:                  false,
 		BasicConstraintsValid: true,
 		SerialNumber:          big.NewInt(ca.nextSerial()),
 		Subject: pkix.Name{
@@ -88,6 +89,7 @@ func (ca *AutoCA) GetHostCertificateTemplate(hosts []string, notBefore time.Time
 		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth, x509.ExtKeyUsageClientAuth},
 		KeyUsage:    x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
 		DNSNames:    dn,
+		IPAddresses: addrs,
 	}
 
 	return template
@@ -96,7 +98,7 @@ func (ca *AutoCA) GetHostCertificateTemplate(hosts []string, notBefore time.Time
 func (ca *AutoCA) GetUserCertificateTemplate(cn string, notBefore time.Time, notAfter time.Time) *x509.Certificate {
 
 	template := &x509.Certificate{
-		IsCA: false,
+		IsCA:                  false,
 		BasicConstraintsValid: true,
 		SerialNumber:          big.NewInt(ca.nextSerial()),
 		Subject: pkix.Name{
