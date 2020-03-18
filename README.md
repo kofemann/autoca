@@ -45,6 +45,6 @@ $ rm autoca.out
 
 ## LICENSE
 
-This work is published under [GPLv3][1] license.
+This work is published under [AGPLv3][1] license.
 
-[1]: https://www.gnu.org/licenses/gpl-3.0.txt
+[1]: https://www.gnu.org/licenses/agpl-3.0.txt
