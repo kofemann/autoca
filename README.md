@@ -43,6 +43,11 @@ $ jq -r '.key?' autoca.out > hostkey.pem
 $ rm autoca.out
 ```
 
+## Alternatives
+
+- [CloudFlare's PKI/TLS toolkit](https://github.com/cloudflare/cfssl)
+- [Vault by  hashicorp](https://www.vaultproject.io/docs/secrets/pki/)
+
 ## LICENSE
 
 This work is published under [AGPLv3][1] license.
