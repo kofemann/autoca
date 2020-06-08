@@ -77,7 +77,7 @@ func (webca *WebCa) handleGet(rw http.ResponseWriter, req *http.Request) {
 	var t *x509.Certificate
 
 	cn := req.FormValue("cn")
-	// id no CN provided use the client's host name
+	// if no CN provided use the client's host name
 	if len(cn) == 0 {
 
 		// are we behind a proxy, if not get hostname from the request.
