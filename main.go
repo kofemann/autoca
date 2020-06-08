@@ -29,17 +29,23 @@ func main() {
 	}
 
 	webCa := &webca.WebCa{Ca: ca, Conf: conf}
+	http.HandleFunc("/v1/certificate", webCa.Handle)
 
-	if conf.Web.GenerateCert {
-		_, err := os.Stat(conf.Web.CertFile)
-		if err != nil && os.IsNotExist(err) {
-			webCa.CreateLocalCerts(conf.Web.CertFile, conf.Web.KeyFile)
+	if conf.Web.UseTls {
+		if conf.Web.GenerateCert {
+			_, err := os.Stat(conf.Web.CertFile)
+			if err != nil && os.IsNotExist(err) {
+				webCa.CreateLocalCerts(conf.Web.CertFile, conf.Web.KeyFile)
+			}
 		}
+
+		err = http.ListenAndServeTLS(":"+strconv.Itoa(conf.Web.Port), conf.Web.CertFile, conf.Web.KeyFile, nil)
+    } else {
+		err = http.ListenAndServe(":"+strconv.Itoa(conf.Web.Port), nil)
 	}
 
-	http.HandleFunc("/v1/certificate", webCa.Handle)
-	err = http.ListenAndServeTLS(":"+strconv.Itoa(conf.Web.Port), conf.Web.CertFile, conf.Web.KeyFile, nil)
 	if err != nil {
 		log.Fatal("Failed to start server:", err)
 	}
+
 }

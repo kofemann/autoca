@@ -18,6 +18,7 @@ type Conf struct {
 	}
 	Web struct {
 		Port         int      `yaml:"port"`
+		UseTls       bool     `yaml:"tls"`
 		CertFile     string   `yaml:"cert"`
 		KeyFile      string   `yaml:"key"`
 		Hosts        []string `yaml:"hosts"`
