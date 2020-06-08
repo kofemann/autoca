@@ -79,10 +79,17 @@ func (webca *WebCa) handleGet(rw http.ResponseWriter, req *http.Request) {
 	cn := req.FormValue("cn")
 	// id no CN provided use the client's host name
 	if len(cn) == 0 {
-		host, _, err := net.SplitHostPort(req.RemoteAddr)
-		if err != nil {
-			http.Error(rw, err.Error(), http.StatusInternalServerError)
-			return
+
+		// are we behind a proxy, if not get hostname from the request.
+		host := req.Header.Get("X-Real-IP")
+
+		if len(host) == 0 {
+			var err error;
+			host, _, err = net.SplitHostPort(req.RemoteAddr)
+			if err != nil {
+				http.Error(rw, err.Error(), http.StatusInternalServerError)
+				return
+			}
 		}
 
 		hostNames, err := net.LookupAddr(host)
