@@ -3,7 +3,7 @@ image: golang:latest
 
 variables:
   # Please edit to your GitLab project
-  REPO_NAME: github/kofemann/tdb2_ldap
+  REPO_NAME: github/kofemann/autoca
 
 # The problem is that to be able to use go get, one needs to put
 # the repository in the $GOPATH. So for example if your gitlab domain
@@ -32,7 +32,7 @@ compile:
   script:
     - go mod init
     - go get gopkg.in/yaml.v2
-    - go build -race -ldflags "-extldflags '-static' -X main.revision=`git describe --always --long --dirty`" -o $CI_PROJECT_DIR/tdb2_ldap
+    - go build -race -ldflags "-extldflags '-static' -X main.revision=`git describe --always --long --dirty`" -o $CI_PROJECT_DIR/autoca
   artifacts:
     paths:
       - autoca
