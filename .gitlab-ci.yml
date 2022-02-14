@@ -15,6 +15,7 @@ before_script:
   - mkdir -p $GOPATH/src/$(dirname $REPO_NAME)
   - ln -svf $CI_PROJECT_DIR $GOPATH/src/$REPO_NAME
   - cd $GOPATH/src/$REPO_NAME
+  - go mod init
 
 stages:
   - test
@@ -30,7 +31,6 @@ format:
 compile:
   stage: build
   script:
-    - go mod init
     - go get gopkg.in/yaml.v2
     - go build -race -ldflags "-extldflags '-static' -X main.revision=`git describe --always --long --dirty`" -o $CI_PROJECT_DIR/autoca
   artifacts:
