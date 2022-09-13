@@ -22,7 +22,6 @@ format:
     - go get gopkg.in/yaml.v2
   script:
     - go fmt $(go list ./...)
-    - go vet $(go list ./...)
     - go test -race $(go list ./...)
 
 compile:
