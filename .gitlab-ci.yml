@@ -3,7 +3,7 @@ image: golang:latest
 
 variables:
   # Please edit to your GitLab project
-  REPO_NAME: github/kofemann/autoca
+  REPO_NAME: github.com/kofemann/autoca
 
 stages:
   - test
