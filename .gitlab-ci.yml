@@ -15,7 +15,8 @@ format:
   before_script:
     - cd $GOPATH/src
     - mkdir -p $REPO_NAME
-    - ln -s $CI_PROJECT_DIR $REPO_NAME
+    - ln -sv $CI_PROJECT_DIR $REPO_NAME
+    - cd $GOPATH/src/$REPO_NAME
     - go mod init
     - go get gopkg.in/yaml.v2
   script:
@@ -29,7 +30,8 @@ compile:
   before_script:
     - cd $GOPATH/src
     - mkdir -p $REPO_NAME
-    - ln -s $CI_PROJECT_DIR $REPO_NAME
+    - ln -sv $CI_PROJECT_DIR $REPO_NAME
+    - cd $GOPATH/src/$REPO_NAME
     - go mod init
     - go get gopkg.in/yaml.v2
   script:
