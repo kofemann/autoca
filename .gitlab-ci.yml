@@ -15,7 +15,7 @@ format:
   before_script:
     - cd $GOPATH/src
     - mkdir -p $REPO_NAME
-    - rmdir $CI_PROJECT_NAME
+    - rmdir $REPO_NAME
     - ln -svf $CI_PROJECT_DIR $REPO_NAME
     - cd $GOPATH/src/$REPO_NAME
     - go mod init
@@ -31,7 +31,7 @@ compile:
   before_script:
     - cd $GOPATH/src
     - mkdir -p $REPO_NAME
-    - rmdir $CI_PROJECT_NAME
+    - rmdir $REPO_NAME
     - ln -svf $CI_PROJECT_DIR $REPO_NAME
     - cd $GOPATH/src/$REPO_NAME
     - go mod init
