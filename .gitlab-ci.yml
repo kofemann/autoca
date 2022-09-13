@@ -19,7 +19,7 @@ format:
     - ln -svf $CI_PROJECT_DIR $REPO_NAME
     - cd $GOPATH/src/$REPO_NAME
     - go mod init
-    - go mod tidy
+    - go get gopkg.in/yaml.v2
   script:
     - go fmt $(go list ./...)
     - go test -race $(go list ./...)
@@ -34,7 +34,7 @@ compile:
     - ln -svf $CI_PROJECT_DIR $REPO_NAME
     - cd $GOPATH/src/$REPO_NAME
     - go mod init
-    - go go mod tidy
+    - go get gopkg.in/yaml.v2
   script:
     - go build -race -ldflags "-extldflags '-static' -X main.revision=`git describe --always --long --dirty`" -o $CI_PROJECT_DIR/autoca
   artifacts:
