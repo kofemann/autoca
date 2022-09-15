@@ -1,6 +1,7 @@
 package webca
 
 import (
+	"bytes"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
@@ -179,8 +180,11 @@ func (webca *WebCa) CreateLocalCerts(certFile string, keyFile string) {
 		LOGGER.Fatalf("Can't create a certificate:  %v\n", err)
 	}
 
+	caCertOut := webca.encodePkcs1Cert(webca.Ca.GetCaCertificate())
+
 	certOut, keyOut := webca.encodePkcs1CertAndKey(x, privatekey)
-	err = ioutil.WriteFile(certFile, certOut, 0400)
+	certAndChain := bytes.Join([][]byte{certOut, caCertOut}, []byte(""))
+	err = ioutil.WriteFile(certFile, certAndChain, 0400)
 	if err != nil {
 		LOGGER.Fatalf("Failed to write certificate: %v\n", err)
 	}
@@ -200,6 +204,11 @@ func rsaToPkcs8(key *rsa.PrivateKey) []byte {
 
 	out, _ := asn1.Marshal(pkey)
 	return out
+}
+
+func (webca *WebCa) encodePkcs1Cert(cert []byte) []byte {
+	certOut := pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: cert})
+	return certOut
 }
 
 func (webca *WebCa) encodePkcs1CertAndKey(cert []byte, key *rsa.PrivateKey) ([]byte, []byte) {

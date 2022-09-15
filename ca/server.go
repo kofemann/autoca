@@ -132,6 +132,10 @@ func (ca *AutoCA) CreateCertificate(template *x509.Certificate, publicKey *rsa.P
 
 }
 
+func (ca *AutoCA) GetCaCertificate() []byte {
+	return ca.cert.Raw
+}
+
 func (ca *AutoCA) nextSerial() int64 {
 
 	ca.serialDBLock.Lock()
