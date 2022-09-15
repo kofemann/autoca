@@ -84,7 +84,7 @@ func (webca *WebCa) handleGet(rw http.ResponseWriter, req *http.Request) {
 		host := req.Header.Get("X-Real-IP")
 
 		if len(host) == 0 {
-			var err error;
+			var err error
 			host, _, err = net.SplitHostPort(req.RemoteAddr)
 			if err != nil {
 				http.Error(rw, err.Error(), http.StatusInternalServerError)
